@@ -80,5 +80,13 @@ public class OrdineDiProduzioneDTO {
         this.stato = stato;
     }
 
+    @Override
+    public String toString() {
+        return "OrdineDiProduzioneDTO [idOdp=" + idOdp + ", numeroOdP=" + numeroOdP + ", codiceArticolo="
+                + codiceArticolo + ", stato=" + stato + ", scarti=" + scarti + ", schedaControllo=" + schedaControllo
+                + "]";
+    }
+
+    
 
 }

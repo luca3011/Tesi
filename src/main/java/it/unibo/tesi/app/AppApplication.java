@@ -15,15 +15,28 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class AppApplication {
 
+	private String OdP = "";
+	OrdineDiProduzioneDTO ordineDTO;
+
 	public static void main(String[] args) {
 		SpringApplication.run(AppApplication.class, args);
 	}
 
 	private String data;
 
-	@Scheduled(fixedDelay = 500)
+	@Scheduled(fixedDelay = 30000)
 	public void getStatus(){
 		data = "Applicazione attiva, ultima sincronizzazione: " + new Date();
+		
+		DAOFactory daoFactoryInstance = DAOFactory.getDAOFactory();
+
+		OrdineDiProduzioneDAO ordineDAO = daoFactoryInstance.getOrdineDiProduzioneDAO();
+		OrdineDiProduzioneDTO ordineDTO = ordineDAO.read("22/02121");
+		
+		OdP = ordineDTO.toString();
+
+		data = data + OdP;
+
 	}
 
 	@GetMapping(value="/stato")
