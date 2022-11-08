@@ -2,6 +2,7 @@ package it.unibo.tesi.app.Jdbc;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 
 import it.unibo.tesi.app.SchedaControlloDAO;
 import it.unibo.tesi.app.SchedaControlloDTO;
@@ -11,19 +12,19 @@ public class JdbcSchedaControlloDAO implements SchedaControlloDAO{
 
     // === Costanti letterali per non sbagliarsi a scrivere !!! ============================
 
-	static final String TABLE = "[dbo].[SCCL_SchedaControlloControlli]";
+	static final String TABLE = "[dbo].[SCCL_SchedaControllo]";
 
 	// -------------------------------------------------------------------------------------
 
-	static final String CODICE = "[Codice]";
-	static final String MODULOCONTROLLO = "[ModuloControllo]";
-	static final String DATA = "[DataEsito]";
-    static final String NOTE = "[Nota]";
+	static final String CODICE = "Codice";
+	static final String MODULOCONTROLLO = "ModuloControllo";
+	static final String DATA = "DataEsito";
+    static final String NOTE = "Nota";
 	
-	static final String TBCreated = "[TBCreated]";
-	static final String TBModified = "[TBModified]";
-	static final String TBCreatedID = "[TBCreatedID]";
-	static final String TBModifiedID = "[TBModifiedID]";
+	static final String TBCreated = "TBCreated";
+	static final String TBModified = "TBModified";
+	static final String TBCreatedID = "TBCreatedID";
+	static final String TBModifiedID = "TBModifiedID";
 
 	// == STATEMENT SQL ====================================================================
 
@@ -44,7 +45,10 @@ public class JdbcSchedaControlloDAO implements SchedaControlloDAO{
 			TBModifiedID +
 			") " +
 			"VALUES (?,?,?,?,?,?,?) ";
-
+	
+	// SELECT MAX(CODICE) FROM table;
+	static String max_code = "SELECT MAX(" + CODICE + ") as CODICE " +
+			"FROM " + TABLE;
 	
 	// === METODI DAO =========================================================================
 
@@ -138,5 +142,46 @@ public class JdbcSchedaControlloDAO implements SchedaControlloDAO{
 		return result;*/
 	}
 
-    
+
+	@Override
+	public int nextCode() {
+		// --- 1. Dichiarazione della variabile per il risultato ---
+		int result = -1;
+		// --- 2. Controlli preliminari sui dati in ingresso ---
+		
+		// --- 3. Apertura della connessione ---
+		Connection conn = JdbcDAOFactory.createConnection();
+		// --- 4. Tentativo di accesso al db e impostazione del risultato ---
+		try {
+			// --- a. Crea (se senza parametri) o prepara (se con parametri) lo statement
+			PreparedStatement prep_stmt = conn.prepareStatement(max_code);
+			// --- b. Pulisci e imposta i parametri (se ve ne sono)
+			prep_stmt.clearParameters();
+			// --- c. Esegui l'azione sul database ed estrai il risultato (se atteso)
+			ResultSet rs = prep_stmt.executeQuery();
+			// --- d. Cicla sul risultato (se presente) pe accedere ai valori di ogni sua tupla
+			if (rs.next()) {
+				int entry;
+				entry = rs.getInt(CODICE);
+				result = entry;
+			}
+			// --- e. Rilascia la struttura dati del risultato
+			rs.close();
+			// --- f. Rilascia la struttura dati dello statement
+			prep_stmt.close();
+		}
+		// --- 5. Gestione di eventuali eccezioni ---
+		catch (Exception e) {
+			System.err.println("nextcode(): " + max_code + " failed to retrieve max entry from: " + TABLE + e.getMessage());
+			e.printStackTrace();
+		}
+		// --- 6. Rilascio, SEMPRE E COMUNQUE, la connessione prima di restituire il controllo al chiamante
+		finally {
+			JdbcDAOFactory.closeConnection(conn);
+		}
+		// --- 7. Restituzione del risultato (eventualmente di fallimento)
+		return result;
+	}
+
+
 }

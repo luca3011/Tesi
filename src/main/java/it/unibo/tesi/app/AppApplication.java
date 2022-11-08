@@ -27,16 +27,7 @@ public class AppApplication {
 	@Scheduled(fixedDelay = 30000)
 	public void getStatus(){
 		data = "Applicazione attiva, ultima sincronizzazione: " + new Date();
-		
-		DAOFactory daoFactoryInstance = DAOFactory.getDAOFactory();
-
-		OrdineDiProduzioneDAO ordineDAO = daoFactoryInstance.getOrdineDiProduzioneDAO();
-		OrdineDiProduzioneDTO ordineDTO = ordineDAO.read("22/02121");
-		
-		OdP = ordineDTO.toString();
-
-		data = data + OdP;
-
+		sync();
 	}
 
 	@GetMapping(value="/stato")
@@ -44,6 +35,21 @@ public class AppApplication {
 		return data;
 	}
 	
+	public void sync()
+	{
+
+		DAOFactory daoFactoryInstance = DAOFactory.getDAOFactory();
+
+		OrdineDiProduzioneDAO ordineDAO = daoFactoryInstance.getOrdineDiProduzioneDAO();
+		SchedaControlloDAO schedaDAO = daoFactoryInstance.getSchedaControlloDAO();
+		ControlloDAO controlloDAO = daoFactoryInstance.getControlloDAO();
+
+		OrdineDiProduzioneDTO ordineDTO = ordineDAO.read("04/00005");
+		
+
+		
+	}
+
 
 
 }

@@ -14,14 +14,14 @@ public class JdbcControlloDAO implements ControlloDAO {
 
 	// -------------------------------------------------------------------------------------
 
-	static final String CODICE = "[Codice]";
-	static final String RIGA = "[Riga]";
-	static final String ESITO = "[Valore]";
+	static final String CODICE = "Codice";
+	static final String RIGA = "Riga";
+	static final String ESITO = "Valore";
 	
-	static final String TBCreated = "[TBCreated]";
-	static final String TBModified = "[TBModified]";
-	static final String TBCreatedID = "[TBCreatedID]";
-	static final String TBModifiedID = "[TBModifiedID]";
+	static final String TBCreated = "TBCreated";
+	static final String TBModified = "TBModified";
+	static final String TBCreatedID = "TBCreatedID";
+	static final String TBModifiedID = "TBModifiedID";
 
 	// == STATEMENT SQL ====================================================================
 

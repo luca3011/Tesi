@@ -15,12 +15,12 @@ public class JdbcOrdineDiProduzioneDAO implements OrdineDiProduzioneDAO {
 
 	// -------------------------------------------------------------------------------------
 
-	static final String IDODP = "[MOId]";
-	static final String NUMEROODP = "[MONo]";
-	static final String CODICEARTICOLO = "[BOM]";
-	static final String STATO = "[MOStatus]";
-	static final String SCARTI = "[ScrapQuantity]";
-	static final String SCHEDACONTROLLO = "[SSCL_SchedaCollaudo]";
+	static final String IDODP = "MOId";
+	static final String NUMEROODP = "MONo";
+	static final String CODICEARTICOLO = "BOM";
+	static final String STATO = "MOStatus";
+	static final String SCARTI = "ScrapQuantity";
+	static final String SCHEDACONTROLLO = "SSCL_SchedaCollaudo";
 
 	// == STATEMENT SQL ====================================================================
 
