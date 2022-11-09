@@ -21,8 +21,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class AppApplication {
 
-	OrdineDiProduzioneDTO ordineDTO;
-
 	public static void main(String[] args) {
 		SpringApplication.run(AppApplication.class, args);
 	}
@@ -40,10 +38,15 @@ public class AppApplication {
 		return data;
 	}
 	
+	private String folderXls = "/home/luca";
+	private String codiceScheda = "FLOW_TEST";
+	private String codiceControllo = "OK_FLOW";
+	private int esitoControlloTerminato = 124715008;
+
 	public void sync()
 	{
 
-		final File folder = new File("/home/luca");
+		final File folder = new File(folderXls);
 		ArrayList<File> fileXls = listXlsForFolder(folder);
 
 		ArrayList<RigaExcel> righe = new ArrayList<>();
@@ -68,9 +71,7 @@ public class AppApplication {
 				if(isTerminato(riga.getOdp())){
 					OdPterminati.add(riga.getOdp());
 				}
-
 			}
-			
 		}
 		
 		System.out.println(OdPterminati);
@@ -79,11 +80,10 @@ public class AppApplication {
 
 		ArrayList<OrdineDiProduzioneDTO> OdPCompleto = new ArrayList<>();
 
-
 		//creo una scheda collaudo per ogni odp
 		for (OrdineDiProduzioneDTO odp : OdPdaAggiornare) {
 			
-			SchedaControlloDTO scheda = new SchedaControlloDTO(schedaNextCode(), "FLOW_TEST", "Odp di origine: " + odp.getNumeroOdP());
+			SchedaControlloDTO scheda = new SchedaControlloDTO(schedaNextCode(), codiceScheda, "Odp di origine: " + odp.getNumeroOdP(),esitoControlloTerminato);
 
 			ArrayList<ControlloDTO> controlli = new ArrayList<>();
 			ControlloDTO controllo;
@@ -95,7 +95,7 @@ public class AppApplication {
 				{
 					if(riga.getEsito().compareTo("ABORT")!=0)
 					{
-						controllo = new ControlloDTO(scheda.getCodice(), Integer.parseInt(riga.getProgressivo()), riga.getEsito(), "OK_FLOW");
+						controllo = new ControlloDTO(scheda.getCodice(), Integer.parseInt(riga.getProgressivo()), riga.getEsito(), codiceControllo);
 
 						if(controllo.isKO())
 						{
@@ -108,7 +108,6 @@ public class AppApplication {
 						scheda.setDataEsito(riga.getData());
 					}
 				}
-
 			}
 
 			//aggiungo la lista di controlli alla scheda

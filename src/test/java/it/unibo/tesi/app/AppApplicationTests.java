@@ -18,9 +18,7 @@ class AppApplicationTests {
 		System.out.println("Prova");
 
 		DAOFactory daoFactoryInstance = DAOFactory.getDAOFactory();
-		SchedaControlloDAO schedaDAO = daoFactoryInstance.getSchedaControlloDAO();
 		OrdineDiProduzioneDAO ordineDAO = daoFactoryInstance.getOrdineDiProduzioneDAO();
-		ControlloDAO controlloDAO = daoFactoryInstance.getControlloDAO();
 
 		String numero_odp = "04/00005";
 
@@ -47,7 +45,7 @@ class AppApplicationTests {
 		
 		assertEquals(schedaDAO.nextCode(),7);
 
-		SchedaControlloDTO scheda = new SchedaControlloDTO(8, "TEST", "SCHEDA DI TEST");
+		SchedaControlloDTO scheda = new SchedaControlloDTO(8, "TEST", "SCHEDA DI TEST", 124715008);
 		scheda.setDataEsito(new Date());
 	
 		schedaDAO.create(scheda);
@@ -66,7 +64,7 @@ class AppApplicationTests {
 		ArrayList<ControlloDTO> controlli = new ArrayList<>();
 
 		for (int i = 1; i < 5; i++) {
-			controlli.add(new ControlloDTO(7, i, "OK", "OK_FLOW"));
+			controlli.add(new ControlloDTO(8, i, "OK", "OK_FLOW"));
 		}
 
 		for (ControlloDTO controllo : controlli) {

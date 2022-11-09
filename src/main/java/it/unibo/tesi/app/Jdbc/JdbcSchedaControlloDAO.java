@@ -20,6 +20,7 @@ public class JdbcSchedaControlloDAO implements SchedaControlloDAO{
 	static final String MODULOCONTROLLO = "ModuloControllo";
 	static final String DATA = "DataEsito";
     static final String NOTE = "Nota";
+	static final String STATOCONTROLLO = "EsitoControllo";
 	
 	static final String TBCreated = "TBCreated";
 	static final String TBModified = "TBModified";
@@ -39,12 +40,13 @@ public class JdbcSchedaControlloDAO implements SchedaControlloDAO{
 			MODULOCONTROLLO + ", " +
 			DATA + ", " +
             NOTE + ", " +
+			STATOCONTROLLO + ", " +
 			TBCreated + ", " +
 			TBModified + ", " +
 			TBCreatedID + ", " +
 			TBModifiedID +
 			") " +
-			"VALUES (?,?,?,?,?,?,?,?) ";
+			"VALUES (?,?,?,?,?,?,?,?,?) ";
 	
 	// SELECT MAX(CODICE) FROM table;
 	static String max_code = "SELECT MAX(" + CODICE + ") as CODICE " +
@@ -77,10 +79,11 @@ public class JdbcSchedaControlloDAO implements SchedaControlloDAO{
 			prep_stmt.setString(2, scheda.getModuloControllo());
 			prep_stmt.setDate(3, new java.sql.Date(scheda.getDataEsito().getTime()));
             prep_stmt.setString(4, scheda.getNote());
-			prep_stmt.setDate(5, new java.sql.Date(System.currentTimeMillis()));
+			prep_stmt.setInt(5, scheda.getEsitoControllo());
 			prep_stmt.setDate(6, new java.sql.Date(System.currentTimeMillis()));
-			prep_stmt.setString(7, TBCreatedIDefault);
-			prep_stmt.setString(8, TBModifiedIDDefault);
+			prep_stmt.setDate(7, new java.sql.Date(System.currentTimeMillis()));
+			prep_stmt.setString(8, TBCreatedIDefault);
+			prep_stmt.setString(9, TBModifiedIDDefault);
 
 
 			// --- c. Esegui l'azione sul database ed estrai il risultato (se atteso)

@@ -20,7 +20,7 @@ public class OrdineDiProduzioneDTO {
         this.codiceArticolo = codiceArticolo;
         this.stato = stato;
         this.scarti = 0;
-        this.schedaControllo = new SchedaControlloDTO(0, "", "");
+        this.schedaControllo = new SchedaControlloDTO(0, "", "",0);
     }
 
     public OrdineDiProduzioneDTO() {
@@ -29,7 +29,7 @@ public class OrdineDiProduzioneDTO {
         this.codiceArticolo = "";
         this.stato = 0;
         this.scarti = 0;
-        this.schedaControllo = new SchedaControlloDTO(0, "", "");;
+        this.schedaControllo = new SchedaControlloDTO(0, "", "",0);;
     }
     
     public int getIdOdp() {
