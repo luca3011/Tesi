@@ -44,7 +44,7 @@ public class JdbcSchedaControlloDAO implements SchedaControlloDAO{
 			TBCreatedID + ", " +
 			TBModifiedID +
 			") " +
-			"VALUES (?,?,?,?,?,?,?) ";
+			"VALUES (?,?,?,?,?,?,?,?) ";
 	
 	// SELECT MAX(CODICE) FROM table;
 	static String max_code = "SELECT MAX(" + CODICE + ") as CODICE " +

@@ -3,6 +3,9 @@ package it.unibo.tesi.app;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.ArrayList;
+import java.util.Date;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -10,7 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 class AppApplicationTests {
 
 	@Test
-	void testDAO()
+	void testOrdineDAO()
 	{
 		System.out.println("Prova");
 
@@ -26,17 +29,51 @@ class AppApplicationTests {
 
 		OrdineDiProduzioneDTO ordine;
 		ordine = ordineDAO.read(numero_odp);
-		System.out.println(ordine);
+		//System.out.println(ordine);
 
-		// ordineDAO.update(null);
-
-		// schedaDAO.create(null);
-
-		assertEquals(schedaDAO.nextCode(),7);
-		
-
-		// controlloDAO.create(null);
+		ordine.incrementaScarti();
+		ordineDAO.update(ordine);
+		ordine = ordineDAO.read(numero_odp);
+		//System.out.println(ordine);
+		assertEquals(ordine.getScarti(), 1);
 
 	}
+
+	@Test
+	void testSchedaDAO(){
+
+		DAOFactory daoFactoryInstance = DAOFactory.getDAOFactory();
+		SchedaControlloDAO schedaDAO = daoFactoryInstance.getSchedaControlloDAO();
+		
+		assertEquals(schedaDAO.nextCode(),7);
+
+		SchedaControlloDTO scheda = new SchedaControlloDTO(8, "TEST", "SCHEDA DI TEST");
+		scheda.setDataEsito(new Date());
+	
+		schedaDAO.create(scheda);
+
+		//da controllare sul db
+	
+	}
+
+	@Test
+	void testControlloDAO()
+	{
+	
+		DAOFactory daoFactoryInstance = DAOFactory.getDAOFactory();
+		ControlloDAO controlloDAO = daoFactoryInstance.getControlloDAO();
+	
+		ArrayList<ControlloDTO> controlli = new ArrayList<>();
+
+		for (int i = 1; i < 5; i++) {
+			controlli.add(new ControlloDTO(7, i, "OK", "OK_FLOW"));
+		}
+
+		for (ControlloDTO controllo : controlli) {
+			controlloDAO.create(controllo);
+		}
+
+	}
+	
 
 }

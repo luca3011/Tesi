@@ -95,7 +95,7 @@ public class AppApplication {
 				{
 					if(riga.getEsito().compareTo("ABORT")!=0)
 					{
-						controllo = new ControlloDTO(scheda.getCodice(), Integer.parseInt(riga.getProgressivo()), riga.getEsito());
+						controllo = new ControlloDTO(scheda.getCodice(), Integer.parseInt(riga.getProgressivo()), riga.getEsito(), "OK_FLOW");
 
 						if(controllo.isKO())
 						{
@@ -233,7 +233,7 @@ public class AppApplication {
 		DAOFactory daoFactoryInstance = DAOFactory.getDAOFactory();
 		SchedaControlloDAO schedaDAO = daoFactoryInstance.getSchedaControlloDAO();
 
-		return schedaDAO.nextCode();
+		return schedaDAO.nextCode() + 1;
 
 	}
 

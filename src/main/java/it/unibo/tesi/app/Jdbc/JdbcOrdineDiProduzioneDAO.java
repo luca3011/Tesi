@@ -20,7 +20,7 @@ public class JdbcOrdineDiProduzioneDAO implements OrdineDiProduzioneDAO {
 	static final String CODICEARTICOLO = "BOM";
 	static final String STATO = "MOStatus";
 	static final String SCARTI = "ScrapQuantity";
-	static final String SCHEDACONTROLLO = "SSCL_SchedaCollaudo";
+	static final String SCHEDACONTROLLO = "SCCL_SchedaCollaudo";
 
 	// == STATEMENT SQL ====================================================================
 
@@ -109,6 +109,7 @@ public class JdbcOrdineDiProduzioneDAO implements OrdineDiProduzioneDAO {
 
 			prep_stmt.setLong(1, OdpUpdated.getScarti());
 			prep_stmt.setInt(2, OdpUpdated.getSchedaControllo().getCodice());
+			prep_stmt.setString(3, OdpUpdated.getNumeroOdP());
 
 			// --- c. Esegui l'azione sul database ed estrai il risultato (se atteso)
 			prep_stmt.executeUpdate();
@@ -157,7 +158,7 @@ public class JdbcOrdineDiProduzioneDAO implements OrdineDiProduzioneDAO {
 				int entry;
 				entry = rs.getInt(STATO);
 				
-				if(entry==2058306)
+				if(entry==20578306)
 					result = true;
 			}
 			// --- e. Rilascia la struttura dati del risultato

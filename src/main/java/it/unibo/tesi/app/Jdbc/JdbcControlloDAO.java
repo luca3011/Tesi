@@ -17,6 +17,7 @@ public class JdbcControlloDAO implements ControlloDAO {
 	static final String CODICE = "Codice";
 	static final String RIGA = "Riga";
 	static final String ESITO = "Valore";
+	static final String CODICECONTROLLO = "CodiceControllo";
 	
 	static final String TBCreated = "TBCreated";
 	static final String TBModified = "TBModified";
@@ -35,12 +36,13 @@ public class JdbcControlloDAO implements ControlloDAO {
 			CODICE + ", " +
 			RIGA + ", " +
 			ESITO + ", " +
+			CODICECONTROLLO + ", " +
 			TBCreated + ", " +
 			TBModified + ", " +
 			TBCreatedID + ", " +
 			TBModifiedID +
 			") " +
-			"VALUES (?,?,?,?,?,?,?) ";
+			"VALUES (?,?,?,?,?,?,?,?) ";
 
 	
 	// === METODI DAO =========================================================================
@@ -67,10 +69,11 @@ public class JdbcControlloDAO implements ControlloDAO {
 			prep_stmt.setInt(1, controllo.getCodiceScheda());
 			prep_stmt.setInt(2, controllo.getNumeroRiga());
 			prep_stmt.setString(3, controllo.getEsito());
-			prep_stmt.setDate(4, new java.sql.Date(System.currentTimeMillis()));
+			prep_stmt.setString(4, controllo.getCodiceControllo());
 			prep_stmt.setDate(5, new java.sql.Date(System.currentTimeMillis()));
-			prep_stmt.setString(6, TBCreatedIDefault);
-			prep_stmt.setString(7, TBModifiedIDDefault);
+			prep_stmt.setDate(6, new java.sql.Date(System.currentTimeMillis()));
+			prep_stmt.setString(7, TBCreatedIDefault);
+			prep_stmt.setString(8, TBModifiedIDDefault);
 			// --- c. Esegui l'azione sul database ed estrai il risultato (se atteso)
 			prep_stmt.executeUpdate();
 			// --- d. Cicla sul risultato (se presente) pe accedere ai valori di ogni sua tupla

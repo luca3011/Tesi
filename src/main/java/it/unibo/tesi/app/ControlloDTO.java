@@ -8,10 +8,13 @@ public class ControlloDTO {
 
     private String esito;
 
-    public ControlloDTO(int codiceScheda, int numeroRiga, String esito) {
+    private String codiceControllo;
+
+    public ControlloDTO(int codiceScheda, int numeroRiga, String esito, String codiceControllo) {
         this.codiceScheda = codiceScheda;
         this.numeroRiga = numeroRiga;
         this.esito = esito;
+        this.codiceControllo = codiceControllo;
     }
 
     public int getCodiceScheda() {
@@ -38,5 +41,8 @@ public class ControlloDTO {
         }
     }
 
+    public String getCodiceControllo() {
+        return codiceControllo;
+    }
 
 }
