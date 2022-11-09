@@ -2,7 +2,6 @@ package it.unibo.tesi.app;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Date;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -33,7 +32,7 @@ public class AppApplication {
 	@Scheduled(fixedDelay = 30000)
 	public void getStatus(){
 		data = "Applicazione attiva, ultima sincronizzazione: " + new Date();
-		sync();
+		//sync()
 	}
 
 	@GetMapping(value="/stato")
@@ -43,10 +42,6 @@ public class AppApplication {
 	
 	public void sync()
 	{
-
-		
-
-		//fare oggetti di tipo riga excel
 
 		final File folder = new File("/home/luca");
 		ArrayList<File> fileXls = listXlsForFolder(folder);
