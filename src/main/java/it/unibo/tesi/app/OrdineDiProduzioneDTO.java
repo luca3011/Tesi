@@ -56,6 +56,11 @@ public class OrdineDiProduzioneDTO {
         this.scarti = scarti;
     }
 
+    public void incrementaScarti()
+    {
+        this.scarti++;
+    }
+
     public void setSchedaControllo(SchedaControlloDTO schedaControllo) {
         this.schedaControllo = schedaControllo;
     }

@@ -26,5 +26,17 @@ public class ControlloDTO {
         return esito;
     }
 
+    public boolean isKO()
+    {
+        if(esito.compareTo("KO")==0)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
 
 }

@@ -15,10 +15,9 @@ public class SchedaControlloDTO {
 
     private ArrayList<ControlloDTO> controlli;
 
-    public SchedaControlloDTO(int codice, String moduloControllo, Date dataEsito, String note) {
+    public SchedaControlloDTO(int codice, String moduloControllo, String note) {
         this.codice = codice;
         this.moduloControllo = moduloControllo;
-        this.dataEsito = dataEsito;
         this.note = note;
         this.controlli = new ArrayList<>();
     }
@@ -39,8 +38,16 @@ public class SchedaControlloDTO {
         return note;
     }
 
+    public void setDataEsito(Date dataEsito) {
+        this.dataEsito = dataEsito;
+    }
+
     public ArrayList<ControlloDTO> getControlli() {
         return controlli;
+    }
+
+    public void setControlli(ArrayList<ControlloDTO> controlli) {
+        this.controlli = controlli;
     }
 
     public void addControllo(ControlloDTO controllo){
