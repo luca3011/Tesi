@@ -26,14 +26,16 @@ public class AppApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(AppApplication.class, args);
+
 	}
 
 	private String data;
+	private final String crono = "0 30 12,17 ? * MON-FRI *";
 
-	@Scheduled(fixedDelay = 300000)
+	@Scheduled(cron = crono)
 	public void getStatus() {
 		data = "Applicazione attiva, ultima sincronizzazione: " + new Date();
-		sync();
+		// sync();
 	}
 
 	@GetMapping(value = "/stato")
@@ -41,31 +43,23 @@ public class AppApplication {
 		return data;
 	}
 
-	private String folderXls = "C:\\Users\\Luca\\Desktop";
-	//private String doneFolderXls = "C:\\Users\\Luca\\Desktop";
-	private String codiceScheda = "FLOW_TEST";
-	private String codiceControllo = "OK_FLOW";
-	private int esitoControlloTerminato = 124715008;
+	private final int esitoControlloTerminato = 124715008;
 
-	//routine principale
-	public void sync() {
+	// routine principale
+	public void sync() throws FileNotFoundException {
 
-		final File folder = new File(folderXls);
-		ArrayList<File> fileXls = listXlsForFolder(folder);
+		DAOFactory daoFactoryInstance = DAOFactory.getDAOFactory();
+		SchedaControlloDAO schedaDAO = daoFactoryInstance.getSchedaControlloDAO();
+		SettingsUtility settings = new SettingsUtility();
 
-		ArrayList<RigaExcel> righe = new ArrayList<>();
-		ArrayList<RigaExcel> temp = new ArrayList<>();
+		final File folder = new File(settings.getFolderXls());
+		XlsUtility fileXls = new XlsUtility(folder);
 
-		for (File xls : fileXls) {
-
-			temp = leggiRigheXls(xls);
-
-			righe.addAll(temp);
-
-		}
+		ArrayList<RigaExcel> righe = fileXls.leggiRigheExcel();
 
 		System.out.println(righe.toString());
 
+		//lista in cui metto gli odp con stato "Terminato"
 		ArrayList<String> OdPterminati = new ArrayList<>();
 
 		for (RigaExcel riga : righe) {
@@ -78,6 +72,7 @@ public class AppApplication {
 			}
 		}
 
+		//creo un oggetto OrdineDiProduzioneDTO per ogni odp terminato letto negli excel
 		ArrayList<OrdineDiProduzioneDTO> OdPdaAggiornare = leggiOdp(OdPterminati);
 
 		ArrayList<OrdineDiProduzioneDTO> OdPCompleto = new ArrayList<>();
@@ -85,7 +80,7 @@ public class AppApplication {
 		// creo una scheda collaudo per ogni odp
 		for (OrdineDiProduzioneDTO odp : OdPdaAggiornare) {
 
-			SchedaControlloDTO scheda = new SchedaControlloDTO(schedaNextCode(), codiceScheda,
+			SchedaControlloDTO scheda = new SchedaControlloDTO(schedaDAO.nextCode(), settings.getCodiceScheda(),
 					"Odp di origine: " + odp.getNumeroOdP(), esitoControlloTerminato);
 
 			ArrayList<ControlloDTO> controlli = new ArrayList<>();
@@ -95,10 +90,13 @@ public class AppApplication {
 			for (RigaExcel riga : righe) {
 
 				if (riga.getOdp().compareTo(odp.getNumeroOdP()) == 0) {
+
+					//ignoro le righe con esito "ABORT"
 					if (riga.getEsito().compareTo("ABORT") != 0) {
 						controllo = new ControlloDTO(scheda.getCodice(), Integer.parseInt(riga.getProgressivo()),
-								riga.getEsito(), codiceControllo);
+								riga.getEsito(), settings.getCodiceControllo());
 
+						//se il controllo ha esito KO vi è uno scarto in più nell'odp
 						if (controllo.isKO()) {
 							odp.incrementaScarti();
 						}
@@ -120,20 +118,70 @@ public class AppApplication {
 			// aggiungo l'odp completo a una lista di odp completi
 			OdPCompleto.add(odp);
 
-			// aggiungo l'odp al DB
+			// aggiungo l'odp con al DB
 			aggiungiOdPCompleto(odp);
 
 		}
 
 		// elimino gli odp trasferiti
-
-		for (OrdineDiProduzioneDTO odp : OdPCompleto) {
-			for (File xls : fileXls) {
-				removeOdPdaXls(xls, odp.getNumeroOdP());
-			}
-		}
+		fileXls.removeOdPdaXls(OdPterminati);
 
 	}
+
+	// controlla se l'odp è terminato
+	public boolean isTerminato(String numero_odp) {
+		DAOFactory daoFactoryInstance = DAOFactory.getDAOFactory();
+		OrdineDiProduzioneDAO ordineDAO = daoFactoryInstance.getOrdineDiProduzioneDAO();
+
+		if (ordineDAO.isTerminato(numero_odp)) {
+			return true;
+		} else
+			return false;
+
+	}
+
+	// legge tutti gli odp data una lista di codici odp
+	public ArrayList<OrdineDiProduzioneDTO> leggiOdp(ArrayList<String> lista_codici) {
+		ArrayList<OrdineDiProduzioneDTO> result = new ArrayList<>();
+
+		DAOFactory daoFactoryInstance = DAOFactory.getDAOFactory();
+		OrdineDiProduzioneDAO ordineDAO = daoFactoryInstance.getOrdineDiProduzioneDAO();
+
+		for (String numero_odp : lista_codici) {
+
+			result.add(ordineDAO.read(numero_odp));
+
+		}
+
+		return result;
+
+	}
+
+	// mette sul DB odp, scheda e controlli
+	public void aggiungiOdPCompleto(OrdineDiProduzioneDTO odp) {
+
+		DAOFactory daoFactoryInstance = DAOFactory.getDAOFactory();
+		SchedaControlloDAO schedaDAO = daoFactoryInstance.getSchedaControlloDAO();
+		OrdineDiProduzioneDAO ordineDAO = daoFactoryInstance.getOrdineDiProduzioneDAO();
+		ControlloDAO controlloDAO = daoFactoryInstance.getControlloDAO();
+
+		SchedaControlloDTO scheda = odp.getSchedaControllo();
+
+		// aggiungo la scheda al DB
+		schedaDAO.create(scheda);
+
+		// aggiungo i controlli al DB
+		for (ControlloDTO controlloDTO : scheda.getControlli()) {
+			controlloDAO.create(controlloDTO);
+		}
+
+		// aggiorna l'odp
+		ordineDAO.update(odp);
+
+	}
+
+
+	//DA TOGLIERE
 
 	// restituisce lista di file .xls in una cartella
 	public ArrayList<File> listXlsForFolder(final File folder) {
@@ -202,68 +250,7 @@ public class AppApplication {
 		return result;
 	}
 
-	// controlla se l'odp è terminato
-	public boolean isTerminato(String numero_odp) {
-		DAOFactory daoFactoryInstance = DAOFactory.getDAOFactory();
-		OrdineDiProduzioneDAO ordineDAO = daoFactoryInstance.getOrdineDiProduzioneDAO();
-
-		if (ordineDAO.isTerminato(numero_odp)) {
-			return true;
-		} else
-			return false;
-
-	}
-
-	// legge tutti gli odp data una lista di codici odp
-	public ArrayList<OrdineDiProduzioneDTO> leggiOdp(ArrayList<String> lista_codici) {
-		ArrayList<OrdineDiProduzioneDTO> result = new ArrayList<>();
-
-		DAOFactory daoFactoryInstance = DAOFactory.getDAOFactory();
-		OrdineDiProduzioneDAO ordineDAO = daoFactoryInstance.getOrdineDiProduzioneDAO();
-
-		for (String numero_odp : lista_codici) {
-
-			result.add(ordineDAO.read(numero_odp));
-
-		}
-
-		return result;
-
-	}
-
-	// legge il prossimo numero di scheda
-	public int schedaNextCode() {
-
-		DAOFactory daoFactoryInstance = DAOFactory.getDAOFactory();
-		SchedaControlloDAO schedaDAO = daoFactoryInstance.getSchedaControlloDAO();
-
-		return schedaDAO.nextCode() + 1;
-
-	}
-
-	// mette sul DB odp, scheda e controlli
-	public void aggiungiOdPCompleto(OrdineDiProduzioneDTO odp) {
-
-		DAOFactory daoFactoryInstance = DAOFactory.getDAOFactory();
-		SchedaControlloDAO schedaDAO = daoFactoryInstance.getSchedaControlloDAO();
-		OrdineDiProduzioneDAO ordineDAO = daoFactoryInstance.getOrdineDiProduzioneDAO();
-		ControlloDAO controlloDAO = daoFactoryInstance.getControlloDAO();
-
-		SchedaControlloDTO scheda = odp.getSchedaControllo();
-
-		// aggiungo la scheda al DB
-		schedaDAO.create(scheda);
-
-		// aggiungo i controlli al DB
-		for (ControlloDTO controlloDTO : scheda.getControlli()) {
-			controlloDAO.create(controlloDTO);
-		}
-
-		// aggiorna l'odp
-		ordineDAO.update(odp);
-
-	}
-
+	// elimina le righe contenenti un certo ODP
 	public static int removeOdPdaXls(File fileXls, String numero_odp) {
 		int result = 0;
 
@@ -289,7 +276,7 @@ public class AppApplication {
 				if (row.getCell(2) != null) {
 
 					if (!row.getCell(2).getStringCellValue().startsWith(numero_odp) || row.getRowNum() == 0) {
-						
+
 						nuovaRiga = sheetDest.createRow(righeCopiate);
 
 						for (Cell cell : row) {

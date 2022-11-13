@@ -183,7 +183,7 @@ public class JdbcSchedaControlloDAO implements SchedaControlloDAO{
 			JdbcDAOFactory.closeConnection(conn);
 		}
 		// --- 7. Restituzione del risultato (eventualmente di fallimento)
-		return result;
+		return result + 1;
 	}
 
 
