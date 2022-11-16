@@ -14,50 +14,25 @@ public class OrdineDiProduzioneDTO {
 
     private SchedaControlloDTO schedaControllo;
 
-    public OrdineDiProduzioneDTO(int idOdp, String numeroOdP, String codiceArticolo, int stato) {
-        this.idOdp = idOdp;
-        this.numeroOdP = numeroOdP;
-        this.codiceArticolo = codiceArticolo;
-        this.stato = stato;
-        this.scarti = 0;
-        this.schedaControllo = new SchedaControlloDTO(0, "", "",0);
-    }
-
     public OrdineDiProduzioneDTO() {
         this.idOdp = 0;
         this.numeroOdP = "";
         this.codiceArticolo = "";
         this.stato = 0;
         this.scarti = 0;
-        this.schedaControllo = new SchedaControlloDTO(0, "", "",0);;
-    }
-    
-    public int getIdOdp() {
-        return idOdp;
+        this.schedaControllo = new SchedaControlloDTO(0, "", "", 0);
+        ;
     }
 
     public String getNumeroOdP() {
         return numeroOdP;
     }
 
-    public String getCodiceArticolo() {
-        return codiceArticolo;
-    }
-
-    public int getStato() {
-        return stato;
-    }
-
     public int getScarti() {
         return scarti;
     }
 
-    public void setScarti(int scarti) {
-        this.scarti = scarti;
-    }
-
-    public void incrementaScarti()
-    {
+    public void incrementaScarti() {
         this.scarti++;
     }
 
@@ -91,7 +66,5 @@ public class OrdineDiProduzioneDTO {
                 + codiceArticolo + ", stato=" + stato + ", scarti=" + scarti + ", schedaControllo=" + schedaControllo
                 + "]";
     }
-
-    
 
 }

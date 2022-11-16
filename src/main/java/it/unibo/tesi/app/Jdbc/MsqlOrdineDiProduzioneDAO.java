@@ -8,7 +8,7 @@ import it.unibo.tesi.app.OrdineDiProduzioneDAO;
 import it.unibo.tesi.app.OrdineDiProduzioneDTO;
 
 
-public class JdbcOrdineDiProduzioneDAO implements OrdineDiProduzioneDAO {
+public class MsqlOrdineDiProduzioneDAO implements OrdineDiProduzioneDAO {
 	// === Costanti letterali per non sbagliarsi a scrivere !!! ============================
 
 	static final String TABLE = "[dbo].[MA_MO]";
@@ -51,7 +51,7 @@ public class JdbcOrdineDiProduzioneDAO implements OrdineDiProduzioneDAO {
 			return result;
 		}
 		// --- 3. Apertura della connessione ---
-		Connection conn = JdbcDAOFactory.createConnection();
+		Connection conn = MsqlDAOFactory.createConnection();
 		// --- 4. Tentativo di accesso al db e impostazione del risultato ---
 		try {
 			// --- a. Crea (se senza parametri) o prepara (se con parametri) lo statement
@@ -84,7 +84,7 @@ public class JdbcOrdineDiProduzioneDAO implements OrdineDiProduzioneDAO {
 		}
 		// --- 6. Rilascio, SEMPRE E COMUNQUE, la connessione prima di restituire il controllo al chiamante
 		finally {
-			JdbcDAOFactory.closeConnection(conn);
+			MsqlDAOFactory.closeConnection(conn);
 		}
 		// --- 7. Restituzione del risultato (eventualmente di fallimento)
 		return result;
@@ -99,7 +99,7 @@ public class JdbcOrdineDiProduzioneDAO implements OrdineDiProduzioneDAO {
 			return result;
 		}
 		// --- 3. Apertura della connessione ---
-		Connection conn = JdbcDAOFactory.createConnection();
+		Connection conn = MsqlDAOFactory.createConnection();
 		// --- 4. Tentativo di accesso al db e impostazione del risultato ---
 		try {
 			// --- a. Crea (se senza parametri) o prepara (se con parametri) lo statement
@@ -128,7 +128,7 @@ public class JdbcOrdineDiProduzioneDAO implements OrdineDiProduzioneDAO {
 		}
 		// --- 6. Rilascio, SEMPRE E COMUNQUE, la connessione prima di restituire il controllo al chiamante
 		finally {
-			JdbcDAOFactory.closeConnection(conn);
+			MsqlDAOFactory.closeConnection(conn);
 		}
 		// --- 7. Restituzione del risultato (eventualmente di fallimento)
 		return result;
@@ -143,7 +143,7 @@ public class JdbcOrdineDiProduzioneDAO implements OrdineDiProduzioneDAO {
 			return false;
 		}
 		// --- 3. Apertura della connessione ---
-		Connection conn = JdbcDAOFactory.createConnection();
+		Connection conn = MsqlDAOFactory.createConnection();
 		// --- 4. Tentativo di accesso al db e impostazione del risultato ---
 		try {
 			// --- a. Crea (se senza parametri) o prepara (se con parametri) lo statement
@@ -173,7 +173,7 @@ public class JdbcOrdineDiProduzioneDAO implements OrdineDiProduzioneDAO {
 		}
 		// --- 6. Rilascio, SEMPRE E COMUNQUE, la connessione prima di restituire il controllo al chiamante
 		finally {
-			JdbcDAOFactory.closeConnection(conn);
+			MsqlDAOFactory.closeConnection(conn);
 		}
 		// --- 7. Restituzione del risultato (eventualmente di fallimento)
 

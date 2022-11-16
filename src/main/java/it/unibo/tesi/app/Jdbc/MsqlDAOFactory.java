@@ -10,7 +10,7 @@ import it.unibo.tesi.app.SchedaControlloDAO;
 
 
 
-public class JdbcDAOFactory extends DAOFactory {
+public class MsqlDAOFactory extends DAOFactory {
 
 	/**
 	 * URI of the database to connect to
@@ -27,11 +27,11 @@ public class JdbcDAOFactory extends DAOFactory {
 	public static Connection createConnection() {
 		try {
 			Connection conn = DriverManager.getConnection (DBURL, USERNAME, PASSWORD);
-			System.out.println(JdbcDAOFactory.class.getName()+".createConnection(): database connection established");
+			System.out.println(MsqlDAOFactory.class.getName()+".createConnection(): database connection established");
 			return conn;
 		} 
 		catch (Exception e) {
-			System.err.println(JdbcDAOFactory.class.getName()+".createConnection(): failed creating connection\n"+e);
+			System.err.println(MsqlDAOFactory.class.getName()+".createConnection(): failed creating connection\n"+e);
 			e.printStackTrace();
 			return null;
 		}
@@ -42,7 +42,7 @@ public class JdbcDAOFactory extends DAOFactory {
 			conn.close();
 		}
 		catch (Exception e) {
-			System.err.println(JdbcDAOFactory.class.getName()+".closeConnection(): failed closing connection\n"+e);
+			System.err.println(MsqlDAOFactory.class.getName()+".closeConnection(): failed closing connection\n"+e);
 			e.printStackTrace();
 		}
 	}
@@ -51,15 +51,15 @@ public class JdbcDAOFactory extends DAOFactory {
 	
 
 	public OrdineDiProduzioneDAO getOrdineDiProduzioneDAO() {
-		return new JdbcOrdineDiProduzioneDAO();
+		return new MsqlOrdineDiProduzioneDAO();
 	}
 
 	public SchedaControlloDAO getSchedaControlloDAO() {
-		return new JdbcSchedaControlloDAO();
+		return new MsqlSchedaControlloDAO();
 	}
 
 	public ControlloDAO getControlloDAO() {
-		return new JdbcControlloDAO();
+		return new MsqlControlloDAO();
 	}
 	
 }

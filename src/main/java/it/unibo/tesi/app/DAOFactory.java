@@ -1,6 +1,6 @@
 package it.unibo.tesi.app;
 
-import it.unibo.tesi.app.Jdbc.JdbcDAOFactory;
+import it.unibo.tesi.app.Jdbc.MsqlDAOFactory;
 
 public abstract class DAOFactory {
 	
@@ -8,7 +8,7 @@ public abstract class DAOFactory {
 	// --- Actual factory method ---
 	
 	public static DAOFactory getDAOFactory() {
-		return new JdbcDAOFactory();
+		return new MsqlDAOFactory();
 	}
 	
 	// --- Factory specification: concrete factories implementing this spec must provide this methods! ---
