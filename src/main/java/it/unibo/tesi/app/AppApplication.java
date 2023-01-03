@@ -26,33 +26,37 @@ public class AppApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(AppApplication.class, args);
-
 	}
 
-	private String data;
+	private String data = "Applicazione attiva, sincronizzazione non ancora eseguita.";
+	private ArrayList<String> odpElaborati = new ArrayList<>();
+
 	private final String crono = "0 30 12,17 ? * MON-FRI *";
-
-	@Scheduled(cron = crono)
-	public void getStatus() {
-		data = "Applicazione attiva, ultima sincronizzazione: " + new Date();
-		// sync();
-	}
 
 	@GetMapping(value = "/stato")
 	public String getMethodName() {
-		return data;
+		
+		String result;
+
+		result = data + "\n\n";
+
+		result = "Ultimi OdP elaborati: ";
+
+		for (String odp : odpElaborati) {
+			result = result + odp + ", ";
+		}
+		
+		return result;
 	}
 
 	private final int esitoControlloTerminato = 124715008;
 
-	// routine principale
+	@Scheduled(cron = crono)
 	public void sync() throws FileNotFoundException {
 
-		DAOFactory daoFactoryInstance = DAOFactory.getDAOFactory();
-		SchedaControlloDAO schedaDAO = daoFactoryInstance.getSchedaControlloDAO();
 		SettingsUtility settings = new SettingsUtility();
-
 		final File folder = new File(settings.getFolderXls());
+		
 		XlsUtility fileXls = new XlsUtility(folder);
 
 		ArrayList<RigaExcel> righe = fileXls.leggiRigheExcel();
@@ -80,7 +84,7 @@ public class AppApplication {
 		// creo una scheda collaudo per ogni odp
 		for (OrdineDiProduzioneDTO odp : OdPdaAggiornare) {
 
-			SchedaControlloDTO scheda = new SchedaControlloDTO(schedaDAO.nextCode(), settings.getCodiceScheda(),
+			SchedaControlloDTO scheda = new SchedaControlloDTO(schedaNextCode(), settings.getCodiceScheda(),
 					"Odp di origine: " + odp.getNumeroOdP(), esitoControlloTerminato);
 
 			ArrayList<ControlloDTO> controlli = new ArrayList<>();
@@ -125,6 +129,9 @@ public class AppApplication {
 
 		// elimino gli odp trasferiti
 		fileXls.removeOdPdaXls(OdPterminati);
+
+		data = "Applicazione attiva, ultima sincronizzazione: " + new Date();
+		odpElaborati = OdPterminati;
 
 	}
 
@@ -177,6 +184,16 @@ public class AppApplication {
 
 		// aggiorna l'odp
 		ordineDAO.update(odp);
+
+	}
+
+	//restituisce il codice della scheda nuova da creare
+	public int schedaNextCode()
+	{
+		DAOFactory daoFactoryInstance = DAOFactory.getDAOFactory();
+		SchedaControlloDAO schedaDAO = daoFactoryInstance.getSchedaControlloDAO();
+		
+		return schedaDAO.nextCode();
 
 	}
 

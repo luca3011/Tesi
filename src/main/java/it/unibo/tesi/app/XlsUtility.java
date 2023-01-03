@@ -205,8 +205,4 @@ public class XlsUtility {
 
     }
 
-    public File getFile() {
-        return file;
-    }
-
 }
