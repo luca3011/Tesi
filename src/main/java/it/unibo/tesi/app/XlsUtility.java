@@ -61,6 +61,8 @@ public class XlsUtility {
 
         for (File filexls : this.files) {
 
+            System.out.println("Leggo dal file .xls: " + filexls.getName());
+
             try {
 
                 temp = new ArrayList<>();
@@ -111,7 +113,6 @@ public class XlsUtility {
     public int removeOdPdaXls(String numero_odp) {
 		
         int result = 0;
-
 
         for (File fileXls : this.files) {
             
@@ -187,6 +188,8 @@ public class XlsUtility {
             
             
         }
+
+        
         
         return result;
 

@@ -26,13 +26,16 @@ public class MsqlDAOFactory extends DAOFactory {
 	
 	public static Connection createConnection() {
 		try {
+
+			System.out.println();
+
 			Connection conn = DriverManager.getConnection (DBURL, USERNAME, PASSWORD);
 			System.out.println(MsqlDAOFactory.class.getName()+".createConnection(): database connection established");
 			return conn;
 		} 
 		catch (Exception e) {
 			System.err.println(MsqlDAOFactory.class.getName()+".createConnection(): failed creating connection\n"+e);
-			e.printStackTrace();
+			//e.printStackTrace();
 			return null;
 		}
 	}
@@ -43,7 +46,6 @@ public class MsqlDAOFactory extends DAOFactory {
 		}
 		catch (Exception e) {
 			System.err.println(MsqlDAOFactory.class.getName()+".closeConnection(): failed closing connection\n"+e);
-			e.printStackTrace();
 		}
 	}
 

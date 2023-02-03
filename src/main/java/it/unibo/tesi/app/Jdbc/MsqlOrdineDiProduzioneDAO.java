@@ -169,7 +169,6 @@ public class MsqlOrdineDiProduzioneDAO implements OrdineDiProduzioneDAO {
 		// --- 5. Gestione di eventuali eccezioni ---
 		catch (Exception e) {
 			System.err.println("read(): failed to retrieve entry with id = " + numeroOdP + ": " + e.getMessage());
-			e.printStackTrace();
 		}
 		// --- 6. Rilascio, SEMPRE E COMUNQUE, la connessione prima di restituire il controllo al chiamante
 		finally {

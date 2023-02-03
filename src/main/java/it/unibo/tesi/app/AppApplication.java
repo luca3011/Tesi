@@ -27,29 +27,46 @@ public class AppApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(AppApplication.class, args);
 	}
-
-	private String data = "Applicazione attiva, sincronizzazione non ancora eseguita.";
+	
+	private String statoApplicazione;
 	private ArrayList<String> odpElaborati = new ArrayList<>();
+	private boolean syncEseguito = false;
 
-	private final String crono = "0 30 12,17 ? * MON-FRI *";
+	private final String crono = "0 30 12,17 ? * MON-FRI";
 
 	@GetMapping(value = "/stato")
-	public String getMethodName() {
+	public String frontend() throws FileNotFoundException {
 		
 		String result;
 
-		result = data + "\n\n";
-
-		result = "Ultimi OdP elaborati: ";
-
-		for (String odp : odpElaborati) {
-			result = result + odp + ", ";
+		if(syncEseguito == true)
+		{
+			result = statoApplicazione + "\n\n";
+	
+			result = "Ultimi OdP elaborati: ";
+	
+			for (String odp : odpElaborati) {
+				result = result + odp + ", ";
+			}
+			
+			return result;
 		}
-		
-		return result;
+		else
+		{
+			return "Applicazione attiva, sincronizzazione non ancora eseguita.";
+		}
+
 	}
 
-	private final int esitoControlloTerminato = 124715008;
+	//per test
+	@GetMapping(value = "/forceUpdate")
+	public String forceUpdate() throws FileNotFoundException {
+		
+		sync();
+
+		return "Update forzato";
+	}
+
 
 	@Scheduled(cron = crono)
 	public void sync() throws FileNotFoundException {
@@ -61,7 +78,7 @@ public class AppApplication {
 
 		ArrayList<RigaExcel> righe = fileXls.leggiRigheExcel();
 
-		System.out.println(righe.toString());
+		System.out.println("Lette " + righe.size() + " righe in totale.");
 
 		//lista in cui metto gli odp con stato "Terminato"
 		ArrayList<String> OdPterminati = new ArrayList<>();
@@ -76,6 +93,8 @@ public class AppApplication {
 			}
 		}
 
+		System.out.println("Odp terminati da elaborare: " + OdPterminati.toString());
+
 		//creo un oggetto OrdineDiProduzioneDTO per ogni odp terminato letto negli excel
 		ArrayList<OrdineDiProduzioneDTO> OdPdaAggiornare = leggiOdp(OdPterminati);
 
@@ -85,7 +104,7 @@ public class AppApplication {
 		for (OrdineDiProduzioneDTO odp : OdPdaAggiornare) {
 
 			SchedaControlloDTO scheda = new SchedaControlloDTO(schedaNextCode(), settings.getCodiceScheda(),
-					"Odp di origine: " + odp.getNumeroOdP(), esitoControlloTerminato);
+					"Odp di origine: " + odp.getNumeroOdP(), settings.getEsitoControlloTerminato());
 
 			ArrayList<ControlloDTO> controlli = new ArrayList<>();
 			ControlloDTO controllo;
@@ -125,12 +144,17 @@ public class AppApplication {
 			// aggiungo l'odp con al DB
 			aggiungiOdPCompleto(odp);
 
+			System.out.println("Elaborato Odp numero:" + odp.getNumeroOdP());
+
 		}
 
 		// elimino gli odp trasferiti
-		fileXls.removeOdPdaXls(OdPterminati);
+		int righeEliminate;
+		righeEliminate = fileXls.removeOdPdaXls(OdPterminati);
+		System.out.println("Eliminate " + righeEliminate + "righe in totale.");
 
-		data = "Applicazione attiva, ultima sincronizzazione: " + new Date();
+		syncEseguito = true;
+		statoApplicazione = "Applicazione attiva, ultima sincronizzazione: " + new Date();
 		odpElaborati = OdPterminati;
 
 	}
@@ -194,151 +218,6 @@ public class AppApplication {
 		SchedaControlloDAO schedaDAO = daoFactoryInstance.getSchedaControlloDAO();
 		
 		return schedaDAO.nextCode();
-
-	}
-
-
-	//DA TOGLIERE
-
-	// restituisce lista di file .xls in una cartella
-	public ArrayList<File> listXlsForFolder(final File folder) {
-
-		ArrayList<File> result = new ArrayList<>();
-
-		for (final File fileEntry : folder.listFiles()) {
-			if (!fileEntry.isDirectory()) {
-
-				if (fileEntry.getName().endsWith(".xls")) {
-					// System.out.println(fileEntry.getName());
-
-					result.add(fileEntry);
-				}
-			}
-		}
-
-		return result;
-	}
-
-	// prende un file e trasforma le righe excel in oggetti RigaExcel
-	public ArrayList<RigaExcel> leggiRigheXls(File xls) {
-
-		ArrayList<RigaExcel> result = new ArrayList<RigaExcel>();
-
-		RigaExcel riga;
-
-		try {
-
-			FileInputStream fis = new FileInputStream(xls);
-			Workbook workbook = new HSSFWorkbook(fis);
-
-			// prendo il primo foglio del file
-			Sheet sheet = workbook.getSheetAt(0);
-
-			String ArticleCode;
-			Date StartTestTime;
-			String Result;
-
-			boolean intestazione = true;
-
-			for (Row row : sheet) {
-
-				if (!intestazione) {
-					ArticleCode = row.getCell(2).getStringCellValue();
-					StartTestTime = row.getCell(3).getDateCellValue();
-					Result = row.getCell(27).getStringCellValue();
-
-					riga = new RigaExcel(ArticleCode, StartTestTime, Result);
-					result.add(riga);
-
-				}
-
-				intestazione = false;
-
-			}
-
-			workbook.close();
-
-			return result;
-
-		} catch (Exception e) {
-			System.out.println("Errore in lettura file " + xls.getName() + " : " + e.getLocalizedMessage());
-		}
-
-		return result;
-	}
-
-	// elimina le righe contenenti un certo ODP
-	public static int removeOdPdaXls(File fileXls, String numero_odp) {
-		int result = 0;
-
-		try {
-
-			FileInputStream fis = new FileInputStream(fileXls);
-			Workbook workbookOrig = new HSSFWorkbook(fis);
-			Workbook workbookDest = new HSSFWorkbook();
-
-			// prendo il primo foglio del file origine
-			Sheet sheetOrig = workbookOrig.getSheetAt(0);
-
-			// creo un foglio nel file destinazione
-			Sheet sheetDest = workbookDest.createSheet();
-
-			Row nuovaRiga;
-			int righeCopiate = 0;
-
-			for (Row row : sheetOrig) {
-
-				System.out.println(row.getCell(2));
-
-				if (row.getCell(2) != null) {
-
-					if (!row.getCell(2).getStringCellValue().startsWith(numero_odp) || row.getRowNum() == 0) {
-
-						nuovaRiga = sheetDest.createRow(righeCopiate);
-
-						for (Cell cell : row) {
-
-							int i = cell.getColumnIndex();
-
-							Cell oldCell = row.getCell(i, Row.MissingCellPolicy.RETURN_BLANK_AS_NULL);
-
-							if (oldCell == null) {
-								nuovaRiga.createCell(i).setCellValue("");
-							} else if (oldCell.getCellType() == CellType.NUMERIC) {
-								nuovaRiga.createCell(i).setCellValue(oldCell.getDateCellValue());
-							} else if (oldCell.getCellType() == CellType.BOOLEAN) {
-								nuovaRiga.createCell(i).setCellValue(oldCell.getBooleanCellValue());
-							} else {
-								nuovaRiga.createCell(i).setCellValue(oldCell.getStringCellValue());
-							}
-
-						}
-
-						righeCopiate++;
-
-					}
-				}
-			}
-
-			workbookOrig.close();
-
-			FileOutputStream fileOut = null;
-			try {
-				fileOut = new FileOutputStream(fileXls);
-				workbookDest.write(fileOut);
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			} finally {
-				fileOut.close();
-			}
-
-			workbookDest.close();
-
-		} catch (Exception e) {
-			System.out.println("Errore eliminazione righe dell'Odp: " + numero_odp + ", " + e.getLocalizedMessage());
-		}
-
-		return result;
 
 	}
 

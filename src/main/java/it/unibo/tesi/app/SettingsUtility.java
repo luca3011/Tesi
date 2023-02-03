@@ -12,22 +12,29 @@ import org.springframework.context.annotation.Bean;
 
 public class SettingsUtility {
 
-    private String folderXls = "C:\\Users\\Luca\\Desktop";
-    private String codiceScheda = "FLOW_TEST";
-    private String codiceControllo = "OK_FLOW";
+    // private String folderXls = "C:\\Users\\Luca\\Desktop";
+    // private String codiceScheda = "FLOW_TEST";
+    // private String codiceControllo = "OK_FLOW";
+    private String folderXls;
+    private String codiceScheda;
+    private String codiceControllo;
     private final int esitoControlloTerminato = 124715008;
 
     public SettingsUtility() {
 
         try {
 
-            String path = "./properties.txt";
+            //String path = "./properties.txt";
+            String path = "C:\\Users\\Luca\\Desktop\\properties.txt";
+
             FileInputStream fis = new FileInputStream(path);
             BufferedReader in = new BufferedReader(new InputStreamReader(fis));
 
             String line = in.readLine();
 
             while (line != null) {
+
+                System.out.println(line);
 
                 if (!line.startsWith("#")) {
                     String[] line_split = line.split(" ");
@@ -53,6 +60,8 @@ public class SettingsUtility {
 
                 line = in.readLine();
             }
+
+
 
         } catch (Exception e) {
             System.err.println("Errore lettura file impostazioni: " + e.getLocalizedMessage());
